@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import queryString from 'query-string'
 import io from 'socket.io-client'
@@ -6,12 +6,41 @@ import io from 'socket.io-client'
 import Board from '../components/Board'
 import './Game.css'
 
+let socket;
 
-const Game = () => {
+const Game = ({ location }) => {
     const [playerXTurn, setPlayerXTurn] = useState(true);
     const [squares, setSquares] = useState(Array(9).fill(null));
     const [stepNumber, setStepNumber] = useState(0);
-    const [status, setStatus] = useState("It is X's turn")
+    const [status, setStatus] = useState("It is X's turn");
+    const [name, setName] = useState('');
+    const [room, setRoom] = useState('');
+    const [users, setUsers] = useState('');
+    const [flag, setFlag] = useState(0);
+    const [moves, setMoves] = useState(undefined);
+    const ENDPOINT = 'http://localhost:3000/';
+
+    useEffect(() => {
+        const { name, room } = queryString.parse(location.search);
+
+        socket = io(ENDPOINT);
+
+        setRoom(room);
+        setName(name);
+
+        socket.emit('join', { name, room }, (error) => {
+            if(error) {
+                setFlag(1);
+                alert(error);
+            }
+        });
+    }, [ENDPOINT, location.search]);
+
+    useEffect(() => {
+        socket.on('roomData', ({ users }) => {
+            setUsers(users);
+        })
+    }, []);
 
     const handleClick = (i) => {
         const square = squares.slice()
@@ -39,7 +68,7 @@ const Game = () => {
             setStatus('Tie');
         }
 
-        console.log(square)
+        socket.emit('move', squares);
     }
 
     const handleReset = () => {
@@ -72,9 +101,9 @@ const Game = () => {
 
     let victory;
     const win = winner(squares);
-        if(win) {
-            victory = 'The winner is ' + (playerXTurn? 'O' : 'X')
-        }
+    if(win) {
+        victory = 'The winner is ' + (playerXTurn? 'O' : 'X')
+    }
 
     return (
         <div className = 'body'>
