@@ -7,6 +7,7 @@ import Board from '../components/Board'
 import './Game.css'
 
 let socket;
+//const socket = io.connect('http://localhost:3000');
 
 const Game = ({ location }) => {
     const [playerXTurn, setPlayerXTurn] = useState(true);
@@ -18,12 +19,12 @@ const Game = ({ location }) => {
     const [users, setUsers] = useState('');
     const [flag, setFlag] = useState(0);
     const [moves, setMoves] = useState(undefined);
-    const ENDPOINT = 'http://localhost:3000/';
+    const ENDPOINT = 'http://localhost:3001';
 
     useEffect(() => {
         const { name, room } = queryString.parse(location.search);
 
-        socket = io(ENDPOINT);
+        socket = io.connect(ENDPOINT);
 
         setRoom(room);
         setName(name);
@@ -34,6 +35,8 @@ const Game = ({ location }) => {
                 alert(error);
             }
         });
+
+        
     }, [ENDPOINT, location.search]);
 
     useEffect(() => {
@@ -123,7 +126,8 @@ const Game = ({ location }) => {
                         <button className = 'button2'>Exit</button>
                         </Link>}
                     </div>
-                    
+                    <br></br>
+                    <h1>{users}{room}</h1>
                 </div>
             </div>
         </div>

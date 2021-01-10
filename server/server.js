@@ -1,5 +1,6 @@
 const http = require('http');
-const app = require('express')();
+const express = require('express');
+const app = express();
 const socket = require('socket.io');
 const cors = require('cors');
 
@@ -16,7 +17,8 @@ const io = socket(server);
 app.use(cors());
 app.use(router);
 
-io.on('connection', (socket) => {
+io.on('connect', (socket) => {
+    console.log('made socket connection', socket.id)
     socket.on('join', ({ name, room }, callback) => {
         const { error, user } = addUser({ id: socket.id, name, room });
 
@@ -43,7 +45,12 @@ io.on('connection', (socket) => {
           io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
           io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
         }
-      })
+    })
+
+    if(io.sockets.clients('room').length === 2) { // max two clients
+    socket.emit('full', room);
+    }
+    
 })
 
 

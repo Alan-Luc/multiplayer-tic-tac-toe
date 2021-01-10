@@ -13,7 +13,7 @@ const App = () => {
   return(
     <Switch>
       <Route exact path='/' component={Join}/>
-      <Route exact path='/game' component={Game}/>
+      <Route exact path='/game/:room' component={Game}/>
     </Switch>
   )
   

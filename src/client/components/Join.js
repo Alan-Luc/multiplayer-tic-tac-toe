@@ -34,7 +34,7 @@ const Join  = () => {
                     required/>
                 </div>
                 {(name.trim() && room.trim()) && 
-                <Link to={`/game?name=${name}&room=${room}`} >
+                <Link to={`/game/${room}`} >
                     <button className ={'button mt-20'}>Join</button>
                 </Link>}
             </form>
