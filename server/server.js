@@ -1,7 +1,6 @@
 const http = require('http');
 const express = require('express');
 const app = express();
-const socket = require('socket.io');
 const cors = require('cors');
 
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
@@ -11,7 +10,14 @@ const router = require('./router');
 const server = http.createServer(app);
 
 //Socket Setup
-const io = socket(server);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+        allowedHeaders: ["Access-Control-Allow-Origin"],
+        credentials: true,
+    }
+})
 
 
 app.use(cors());
@@ -28,14 +34,15 @@ io.on('connect', (socket) => {
 
         socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!`});
 
-        io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
+        //io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
 
         callback();
     })
 
-    socket.on('move', (move) => {
+    socket.on('move', ({ name, room, move}) => {
         const user = getUser(socket.id);
-        io.to(user.room).emit('move', { user: user.name, move })
+        console.log(move);
+        io.to(room).emit('move', { user: name, move })
     })
 
     socket.on('disconnect', () => {
@@ -43,16 +50,16 @@ io.on('connect', (socket) => {
     
         if(user) {
           io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
-          io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
+          //io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
         }
     })
 
-    if(io.sockets.clients('room').length === 2) { // max two clients
+    /*if(io.sockets.clients('room').length === 2) { // max two clients
     socket.emit('full', room);
-    }
+    }*/
     
 })
 
 
 
-server.listen(process.env.PORT || 3000, () => console.log('Server has started.'));
+server.listen(process.env.PORT || 8000, () => console.log('Server has started.'));

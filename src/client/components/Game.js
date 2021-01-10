@@ -5,8 +5,11 @@ import io from 'socket.io-client'
 
 import Board from '../components/Board'
 import './Game.css'
+import { query } from 'express'
 
-let socket;
+let socket = io('http://localhost:8000', {
+    withCredentials: true
+});
 //const socket = io.connect('http://localhost:3000');
 
 const Game = ({ location }) => {
@@ -14,36 +17,42 @@ const Game = ({ location }) => {
     const [squares, setSquares] = useState(Array(9).fill(null));
     const [stepNumber, setStepNumber] = useState(0);
     const [status, setStatus] = useState("It is X's turn");
-    const [name, setName] = useState('');
-    const [room, setRoom] = useState('');
+    //const [name, setName] = useState('');
+    //const [room, setRoom] = useState('');
     const [users, setUsers] = useState('');
     const [flag, setFlag] = useState(0);
     const [moves, setMoves] = useState(undefined);
-    const ENDPOINT = 'http://localhost:3001';
+    const ENDPOINT = 'http://localhost:8000';
 
     useEffect(() => {
-        const { name, room } = queryString.parse(location.search);
+        //const { name, room } = queryString.parse(location.search);
 
         socket = io.connect(ENDPOINT);
 
-        setRoom(room);
-        setName(name);
+        //setRoom(room);
+        //setName(name);
 
-        socket.emit('join', { name, room }, (error) => {
+        socket.emit('join', {
+            name: queryString.parse(location.search).name, 
+            room: queryString.parse(location.search).room 
+        }, 
+        (error) => {
             if(error) {
                 setFlag(1);
                 alert(error);
             }
         });
-
+        socket.on('move', (data) => {
+            console.log(data.move)
+        })
         
     }, [ENDPOINT, location.search]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         socket.on('roomData', ({ users }) => {
             setUsers(users);
         })
-    }, []);
+    }, []);*/
 
     const handleClick = (i) => {
         const square = squares.slice()
@@ -71,7 +80,11 @@ const Game = ({ location }) => {
             setStatus('Tie');
         }
 
-        socket.emit('move', squares);
+        socket.emit('move', {
+            name: queryString.parse(location.search).name,
+            room: queryString.parse(location.search).room,
+            move: squares
+        });
     }
 
     const handleReset = () => {
@@ -127,7 +140,7 @@ const Game = ({ location }) => {
                         </Link>}
                     </div>
                     <br></br>
-                    <h1>{users}{room}</h1>
+                    
                 </div>
             </div>
         </div>
