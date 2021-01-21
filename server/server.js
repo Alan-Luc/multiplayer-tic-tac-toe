@@ -10,6 +10,7 @@ const router = require("./router");
 const server = http.createServer(app);
 
 //Socket Setup
+//Cors setup
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -36,11 +37,16 @@ io.on("connect", (socket) => {
     callback();
   });
 
-  socket.on("move", ({ name, room, move, location, turn }) => {
+  socket.on("move", ({ name, room, move, location, turn, otherTurn, stepNumber }) => {
     //const user = getUser(socket.id);
     console.log(move);
-    io.to(room).emit("move", { move, location, turn, name });
+    console.log(stepNumber)
+    io.to(room).emit("move", { move, location, turn, name, otherTurn, stepNumber });
   });
+
+  socket.on('reset', ({ stepNumber, move, turn, otherTurn, room }) => {
+    io.to(room).emit('reset', ({ stepNumber, move, turn, otherTurn }))
+  })
 
   socket.on("disconnect", () => {
     const user = removeUser(socket.id);

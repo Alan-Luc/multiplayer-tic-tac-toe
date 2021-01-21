@@ -13,10 +13,11 @@ let socket = io("http://localhost:8000", {
 
 const Game = ({ location }) => {
   const [playerXTurn, setPlayerXTurn] = useState(true);
+  const [otherTurn, setOtherTurn] = useState(false);
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [stepNumber, setStepNumber] = useState(0);
   const [status, setStatus] = useState("It is X's turn");
-  const [name, setName] = useState([]);
+  const [name, setName] = useState('');
   const [room, setRoom] = useState("");
   const [users, setUsers] = useState('');
   //const users = useRef();
@@ -51,21 +52,32 @@ const Game = ({ location }) => {
     });*/
     setRoom(room);
 
-    socket.on('move', ({ move, location, turn, name }) => {
+    socket.on('move', ({ move, location, turn, name, otherTurn, stepNumber }) => {
         square[location] = move;
         setSquares(move);
         setPlayerXTurn(turn);
+        setStepNumber(stepNumber + 1);
+        setOtherTurn(otherTurn);
         turn ? setStatus(`It is ${name}'s turn`) : setStatus(`It is ${name}'s turn`);
+        stepNumber === 8 && setStatus("Tie");
         console.log(squares);
         console.log(move);
         console.log(turn);
         console.log(name);
         console.log(users.length);
+        console.log(stepNumber);
     });
 
     socket.on('roomData', ({ users }) => {
         setUsers(users);
         console.log(users);
+    })
+
+    socket.on('reset', ({move, turn, otherTurn, stepNumber }) => {
+        setSquares(move);
+        setPlayerXTurn(turn);
+        setStepNumber(stepNumber);
+        setStatus("It is X's turn")
     })
   }, [ENDPOINT, location.search]);
 
@@ -88,8 +100,9 @@ const Game = ({ location }) => {
     if (squares[i] === null) {
       square[i] = playerXTurn ? "X" : "O";
       setSquares(square);
-      setPlayerXTurn(!playerXTurn);
       setStepNumber(stepNumber + 1);
+      setPlayerXTurn(!playerXTurn);
+      setOtherTurn(!otherTurn);
       //!playerXTurn ? setStatus("It is X's turn") : setStatus("It is O's turn");
     }
     //squares[i] === null ? (squares[i] = this.state.playerXTurn ? 'X' : 'O';) : this.setState({status: 'Please select another tile'});
@@ -106,8 +119,8 @@ const Game = ({ location }) => {
       room: queryString.parse(location.search).room,
       move: square,
       location: i,
-      turn: !playerXTurn
-
+      turn: !playerXTurn,
+      stepNumber: stepNumber
     });
 
     
@@ -116,8 +129,15 @@ const Game = ({ location }) => {
   const handleReset = () => {
     setPlayerXTurn(true);
     setSquares(Array(9).fill(null));
+    const square = squares.slice();
     setStepNumber(0);
     setStatus("It is X's turn");
+    socket.emit('reset', {
+        move: square,
+        turn: playerXTurn,
+        stepNumber: stepNumber,
+        room: queryString.parse(location.search).room,
+    })
   };
 
   const winner = (squares) => {

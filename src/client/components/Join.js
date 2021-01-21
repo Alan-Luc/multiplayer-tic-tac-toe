@@ -5,6 +5,7 @@ import './Join.css'
 
 //Make connection
 //const socket = io.connect('http://localhost:3000');
+//to={`/game/${room}?room=${room}&name=${name}`}
 
 //Emit events
 const Join  = () => {
@@ -34,7 +35,7 @@ const Join  = () => {
                     required/>
                 </div>
                 {(name.trim() && room.trim()) && 
-                <Link to={`/game/${room}?room=${room}&name=${name}`} >
+                <Link to={`/waitingRoom/${room}`} >
                     <button className ={'button mt-20'}>Join</button>
                 </Link>}
             </form>
