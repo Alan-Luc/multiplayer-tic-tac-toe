@@ -35,7 +35,7 @@ const Join  = () => {
                     required/>
                 </div>
                 {(name.trim() && room.trim()) && 
-                <Link to={`/waitingRoom/${room}`} >
+                <Link to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
                     <button className ={'button mt-20'}>Join</button>
                 </Link>}
             </form>

@@ -12,10 +12,10 @@ let socket = io("http://localhost:8000", {
 //const socket = io.connect('http://localhost:3000');
 
 const Game = ({ location }) => {
-  const [playerXTurn, setPlayerXTurn] = useState(true);
-  const [otherTurn, setOtherTurn] = useState(false);
+  const [yourTurn, setYourTurn] = useState((queryString.parse(location.search).turn === '1' ? true : false));
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [stepNumber, setStepNumber] = useState(0);
+  const [xPlayer, setXPlayer] = useState('');
   const [status, setStatus] = useState("It is X's turn");
   const [name, setName] = useState('');
   const [room, setRoom] = useState("");
@@ -33,6 +33,8 @@ const Game = ({ location }) => {
     const square = squares.slice();
     
     setName(queryString.parse(location.search).name);
+    
+    console.log(yourTurn);
 
     socket.emit(
       "join",
@@ -52,30 +54,37 @@ const Game = ({ location }) => {
     });*/
     setRoom(room);
 
-    socket.on('move', ({ move, location, turn, name, otherTurn, stepNumber }) => {
+    socket.on('move', ({ move, location, name, stepNumber }) => {
         square[location] = move;
         setSquares(move);
-        setPlayerXTurn(turn);
         setStepNumber(stepNumber + 1);
-        setOtherTurn(otherTurn);
-        turn ? setStatus(`It is ${name}'s turn`) : setStatus(`It is ${name}'s turn`);
+        //yourTurn ? setStatus(`It is ${name}'s turn`) : setStatus(`It is ${name}'s turn`);
         stepNumber === 8 && setStatus("Tie");
         console.log(squares);
         console.log(move);
-        console.log(turn);
+        //console.log(turn);
         console.log(name);
         console.log(users.length);
         console.log(stepNumber);
     });
 
-    socket.on('roomData', ({ users }) => {
-        setUsers(users);
-        console.log(users);
+    socket.on('turn', (turn) => {
+      setYourTurn(true);
+      console.log(yourTurn);
     })
 
-    socket.on('reset', ({move, turn, otherTurn, stepNumber }) => {
+    socket.on('roomData', ({ pp }) => {
+        setUsers(pp);
+        console.log(users);
+        //console.log(pp[1].name);
+        //console.log(pp[0].name);
+        //console.log(socket.id);
+        
+    })
+
+    socket.on('reset', ({move, turn, stepNumber }) => {
         setSquares(move);
-        setPlayerXTurn(turn);
+        setYourTurn(turn);
         setStepNumber(stepNumber);
         setStatus("It is X's turn")
     })
@@ -97,12 +106,11 @@ const Game = ({ location }) => {
       return;
     }
 
-    if (squares[i] === null) {
-      square[i] = playerXTurn ? "X" : "O";
+    if (yourTurn && (squares[i] === null)) {
+      square[i] = queryString.parse(location.search).turn === '1' ? 'X' : 'O'
       setSquares(square);
       setStepNumber(stepNumber + 1);
-      setPlayerXTurn(!playerXTurn);
-      setOtherTurn(!otherTurn);
+      setYourTurn(false);
       //!playerXTurn ? setStatus("It is X's turn") : setStatus("It is O's turn");
     }
     //squares[i] === null ? (squares[i] = this.state.playerXTurn ? 'X' : 'O';) : this.setState({status: 'Please select another tile'});
@@ -119,22 +127,24 @@ const Game = ({ location }) => {
       room: queryString.parse(location.search).room,
       move: square,
       location: i,
-      turn: !playerXTurn,
       stepNumber: stepNumber
+    });
+
+    socket.emit('turn', {
     });
 
     
   };
 
   const handleReset = () => {
-    setPlayerXTurn(true);
+    setYourTurn(true);
     setSquares(Array(9).fill(null));
     const square = squares.slice();
     setStepNumber(0);
     setStatus("It is X's turn");
     socket.emit('reset', {
         move: square,
-        turn: playerXTurn,
+        turn: yourTurn,
         stepNumber: stepNumber,
         room: queryString.parse(location.search).room,
     })
@@ -168,7 +178,7 @@ const Game = ({ location }) => {
   let victory;
   const win = winner(squares);
   if (win) {
-    victory = "The winner is " + (playerXTurn ? "O" : "X");
+    victory = "The winner is " + (yourTurn ? "O" : "X");
   }
 
   console.log(queryString.parse(location.search).room);

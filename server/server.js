@@ -32,17 +32,22 @@ io.on("connect", (socket) => {
 
     socket.join(room);
 
-    io.to(room).emit('roomData', { room: room, users: getUsersInRoom(room) });
+    io.to(user.room).emit('roomData', { room: user.room, pp: getUsersInRoom(room) });
 
     callback();
   });
 
-  socket.on("move", ({ name, room, move, location, turn, otherTurn, stepNumber }) => {
+  socket.on("move", ({ name, room, move, location, stepNumber }) => {
     //const user = getUser(socket.id);
     console.log(move);
     console.log(stepNumber)
-    io.to(room).emit("move", { move, location, turn, name, otherTurn, stepNumber });
+    io.to(room).emit("move", { move, location, name, stepNumber });
   });
+
+  socket.on('turn', (turn) => {
+    const user = getUser(socket.id);
+    socket.to(user.room).emit('turn', { turn })
+  })
 
   socket.on('reset', ({ stepNumber, move, turn, otherTurn, room }) => {
     io.to(room).emit('reset', ({ stepNumber, move, turn, otherTurn }))
@@ -56,7 +61,7 @@ io.on("connect", (socket) => {
         user: "Admin",
         text: `${user.name} has left.`,
       });
-      io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
+      io.to(user.room).emit('roomData', { room: user.room, pp: getUsersInRoom(user.room)});
     }
   });
 

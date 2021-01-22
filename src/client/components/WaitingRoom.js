@@ -32,20 +32,22 @@ const WaitingRoom = ({ location }) => {
     }, [ENDPOINT, location.search])
 
     useEffect(() => {
-        socket.on('roomData', ({ users }) => {
-            setUsers(users);
+        socket.on('roomData', ({ pp }) => {
+            setUsers(pp);
             //setXPlayer(users[0].name);
-            //setOPlayer(users[1].name)
-            console.log(users);
-        })
+            //setOPlayer(users[1].name);
+            console.log(pp);
+        });
+
+        //socket.to(users[0].id).emit('turn', {turn});
     }, [])
 
     return (
         <div className = "joinOuterContainer">
             <form className = 'joinInnerContainer' >
                 <h1 className = 'heading'>Waiting for Second Player...</h1>
-                {(users.length === 2) && 
-                <Redirect to={`/game/${room}?room=${room}&name=${name}`}/>}
+                {(users && users.length === 2) && 
+                <Redirect to={`/game/${room}?room=${room}&name=${name}&turn=${users[1].name === name ? '2' : '1'}`}/>}
             </form>
             
         </div>
