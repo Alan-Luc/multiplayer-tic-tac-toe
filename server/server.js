@@ -49,8 +49,8 @@ io.on("connect", (socket) => {
     socket.to(user.room).emit('turn', { turn })
   })
 
-  socket.on('reset', ({ stepNumber, move, turn, otherTurn, room }) => {
-    io.to(room).emit('reset', ({ stepNumber, move, turn, otherTurn }))
+  socket.on('reset', ({ stepNumber, move, turn, status, room }) => {
+    io.to(room).emit('reset', ({ stepNumber, move, turn, status }))
   })
 
   socket.on("disconnect", () => {

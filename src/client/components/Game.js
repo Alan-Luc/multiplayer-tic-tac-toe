@@ -16,9 +16,10 @@ const Game = ({ location }) => {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [stepNumber, setStepNumber] = useState(0);
   const [xPlayer, setXPlayer] = useState('');
-  const [status, setStatus] = useState("It is X's turn");
-  const [name, setName] = useState('');
-  const [room, setRoom] = useState("");
+  const [oPlayer, setOPlayer] = useState('');
+  const [status, setStatus] = useState('');
+  const [name, setName] = useState(queryString.parse(location.search).name);
+  const [room, setRoom] = useState(queryString.parse(location.search).room);
   const [users, setUsers] = useState('');
   //const users = useRef();
   const [flag, setFlag] = useState(0);
@@ -32,7 +33,7 @@ const Game = ({ location }) => {
     socket = io.connect(ENDPOINT);
     const square = squares.slice();
     
-    setName(queryString.parse(location.search).name);
+    //setName(queryString.parse(location.search).name);
     
     console.log(yourTurn);
 
@@ -52,20 +53,23 @@ const Game = ({ location }) => {
     /*socket.on("move", (data) => {
       console.log(data.move);
     });*/
-    setRoom(room);
+    //setRoom(room);
 
-    socket.on('move', ({ move, location, name, stepNumber }) => {
+    socket.on('move', ({ move, location }) => {
         square[location] = move;
         setSquares(move);
-        setStepNumber(stepNumber + 1);
-        //yourTurn ? setStatus(`It is ${name}'s turn`) : setStatus(`It is ${name}'s turn`);
-        stepNumber === 8 && setStatus("Tie");
+        //setStepNumber(stepNumber + 1);
+        yourTurn && setStatus(`It is ${name}'s turn`)
+        //stepNumber === 8 && setStatus("Tie");
+        /*for(let m = 0; m<9; m++) {
+          move[m] !== null && setStatus('Tie');
+        }*/
         console.log(squares);
         console.log(move);
         //console.log(turn);
         console.log(name);
         console.log(users.length);
-        console.log(stepNumber);
+        //console.log(stepNumber);
     });
 
     socket.on('turn', (turn) => {
@@ -74,19 +78,23 @@ const Game = ({ location }) => {
     })
 
     socket.on('roomData', ({ pp }) => {
+        setUsers('');
         setUsers(pp);
-        console.log(users);
+        console.log(pp);
+        setStatus(`It is ${pp[0].name}'s turn`)
+        setXPlayer(pp[0].name);
+        setOPlayer(pp[1].name);
         //console.log(pp[1].name);
         //console.log(pp[0].name);
         //console.log(socket.id);
         
-    })
+    });
 
-    socket.on('reset', ({move, turn, stepNumber }) => {
+    socket.on('reset', ({move, turn, stepNumber, status }) => {
         setSquares(move);
         setYourTurn(turn);
         setStepNumber(stepNumber);
-        setStatus("It is X's turn")
+        setStatus(status)
     })
   }, [ENDPOINT, location.search]);
 
@@ -100,16 +108,16 @@ const Game = ({ location }) => {
   const handleClick = (i) => {
     const square = squares.slice();
     const win = winner(square);
-    const tie = stepNumber === 8;
+    
 
     if (win || squares[i]) {
       return;
     }
 
     if (yourTurn && (squares[i] === null)) {
-      square[i] = queryString.parse(location.search).turn === '1' ? 'X' : 'O'
+      square[i] = (queryString.parse(location.search).turn === '1') ? 'X' : 'O'
       setSquares(square);
-      setStepNumber(stepNumber + 1);
+      //setStepNumber(stepNumber + 1);
       setYourTurn(false);
       //!playerXTurn ? setStatus("It is X's turn") : setStatus("It is O's turn");
     }
@@ -118,8 +126,6 @@ const Game = ({ location }) => {
 
     if (win) {
       setStatus("");
-    } else if (tie) {
-      setStatus("Tie");
     }
 
     socket.emit("move",  {
@@ -137,16 +143,17 @@ const Game = ({ location }) => {
   };
 
   const handleReset = () => {
-    setYourTurn(true);
+    setYourTurn((queryString.parse(location.search).turn === '1' ? true : false));
     setSquares(Array(9).fill(null));
     const square = squares.slice();
     setStepNumber(0);
-    setStatus("It is X's turn");
+    setStatus(`It is ${users[0].name} turn`);
     socket.emit('reset', {
-        move: square,
+        move: squares,
         turn: yourTurn,
         stepNumber: stepNumber,
         room: queryString.parse(location.search).room,
+        status: status
     })
   };
 
@@ -178,7 +185,7 @@ const Game = ({ location }) => {
   let victory;
   const win = winner(squares);
   if (win) {
-    victory = "The winner is " + (yourTurn ? "O" : "X");
+    victory = "The winner is pp";
   }
 
   console.log(queryString.parse(location.search).room);
@@ -200,9 +207,9 @@ const Game = ({ location }) => {
 
           <div className='win'>
             {(win || stepNumber === 9) && (
-              <button className='reset' onClick={() => handleReset()}>
-                Play Again?
-              </button>
+              <Link to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
+                    <button className ={'button mt-20'}>Play Again?</button>
+              </Link>
             )}
             <br></br>
             <br></br>

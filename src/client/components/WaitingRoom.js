@@ -46,7 +46,7 @@ const WaitingRoom = ({ location }) => {
         <div className = "joinOuterContainer">
             <form className = 'joinInnerContainer' >
                 <h1 className = 'heading'>Waiting for Second Player...</h1>
-                {(users && users.length === 2) && 
+                {(users && users.length%2 === 0) && 
                 <Redirect to={`/game/${room}?room=${room}&name=${name}&turn=${users[1].name === name ? '2' : '1'}`}/>}
             </form>
             
