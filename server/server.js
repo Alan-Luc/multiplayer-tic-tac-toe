@@ -44,13 +44,19 @@ io.on("connect", (socket) => {
     io.to(room).emit("move", { move, location, name, stepNumber });
   });
 
-  socket.on('turn', (turn) => {
+  socket.on('turn', ({turn}) => {
     const user = getUser(socket.id);
     socket.to(user.room).emit('turn', { turn })
   })
 
-  socket.on('reset', ({ stepNumber, move, turn, status, room }) => {
-    io.to(room).emit('reset', ({ stepNumber, move, turn, status }))
+  socket.on('userList', ({ userList, room }) => {
+    console.log(userList);
+    io.to(room).emit('userList', { userList });
+  })
+
+  socket.on('playAgain', ({ pp, room }) => {
+    pp.slice(0,1);
+    io.to(room).emit('roomData', { pp, room})
   })
 
   socket.on("disconnect", () => {

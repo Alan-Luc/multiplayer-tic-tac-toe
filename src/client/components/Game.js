@@ -78,23 +78,21 @@ const Game = ({ location }) => {
     })
 
     socket.on('roomData', ({ pp }) => {
-        setUsers('');
-        setUsers(pp);
-        console.log(pp);
-        setStatus(`It is ${pp[0].name}'s turn`)
-        setXPlayer(pp[0].name);
-        setOPlayer(pp[1].name);
-        //console.log(pp[1].name);
-        //console.log(pp[0].name);
-        //console.log(socket.id);
+      const userList = pp.slice(0,2);
+      setUsers('');
+      setUsers(userList);
+      console.log(userList);
+      setStatus(`It is ${userList[0].name}'s turn`)
+      setXPlayer(userList[0].name);
+      setOPlayer(userList[1].name);
+      //console.log(pp[1].name);
+      //console.log(pp[0].name);
+      //console.log(socket.id);
         
     });
 
-    socket.on('reset', ({move, turn, stepNumber, status }) => {
-        setSquares(move);
-        setYourTurn(turn);
-        setStepNumber(stepNumber);
-        setStatus(status)
+    socket.on('reset', () => {
+        setUsers(users.slice(0,1))
     })
   }, [ENDPOINT, location.search]);
 
@@ -148,13 +146,13 @@ const Game = ({ location }) => {
     const square = squares.slice();
     setStepNumber(0);
     setStatus(`It is ${users[0].name} turn`);
-    socket.emit('reset', {
+    /*socket.emit('reset', {
         move: squares,
         turn: yourTurn,
         stepNumber: stepNumber,
         room: queryString.parse(location.search).room,
         status: status
-    })
+    })*/
   };
 
   const winner = (squares) => {
@@ -208,7 +206,10 @@ const Game = ({ location }) => {
           <div className='win'>
             {(win || stepNumber === 9) && (
               <Link to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
-                    <button className ={'button mt-20'}>Play Again?</button>
+                    <button onClick={socket.emit('playAgain', {
+                  pp: users,
+                  room: queryString.parse(location.search).room,
+                    })}className ={'button mt-20'}>Play Again?</button>
               </Link>
             )}
             <br></br>

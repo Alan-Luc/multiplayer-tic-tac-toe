@@ -33,6 +33,8 @@ const WaitingRoom = ({ location }) => {
 
     useEffect(() => {
         socket.on('roomData', ({ pp }) => {
+            pp.slice(0,2);
+            setUsers('');
             setUsers(pp);
             //setXPlayer(users[0].name);
             //setOPlayer(users[1].name);
