@@ -38,8 +38,13 @@ const WaitingRoom = ({ location }) => {
             setUsers(pp);
             //setXPlayer(users[0].name);
             //setOPlayer(users[1].name);
-            console.log(pp);
+            //console.log(pp);
         });
+
+        socket.on('playAgain', ({ pp }) => {
+            setUsers('');
+            console.log(users);
+        })
 
         //socket.to(users[0].id).emit('turn', {turn});
     }, [])

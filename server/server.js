@@ -31,22 +31,21 @@ io.on("connect", (socket) => {
     if (error) return callback(error);
 
     socket.join(room);
-
-    io.to(user.room).emit('roomData', { room: user.room, pp: getUsersInRoom(room) });
+    const pp = getUsersInRoom(room);
+    io.to(user.room).emit('roomData', { room: user.room, pp: pp.slice(0,2) });
 
     callback();
   });
 
-  socket.on("move", ({ name, room, move, location, stepNumber }) => {
+  socket.on("move", ({ room, move, location, stepNumber }) => {
     //const user = getUser(socket.id);
     console.log(move);
     console.log(stepNumber)
-    io.to(room).emit("move", { move, location, name, stepNumber });
+    io.to(room).emit("move", { move, location, stepNumber });
   });
 
-  socket.on('turn', ({turn}) => {
-    const user = getUser(socket.id);
-    socket.to(user.room).emit('turn', { turn })
+  socket.on('turn', ({ turn, room }) => {
+    socket.to(room).emit('turn', { turn })
   })
 
   socket.on('userList', ({ userList, room }) => {
@@ -55,8 +54,8 @@ io.on("connect", (socket) => {
   })
 
   socket.on('playAgain', ({ pp, room }) => {
-    pp.slice(0,1);
-    io.to(room).emit('roomData', { pp, room})
+    io.to(room).emit('playAgain', {})
+    io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
   })
 
   socket.on("disconnect", () => {

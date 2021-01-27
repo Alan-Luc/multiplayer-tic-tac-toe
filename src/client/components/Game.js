@@ -59,7 +59,8 @@ const Game = ({ location }) => {
         square[location] = move;
         setSquares(move);
         //setStepNumber(stepNumber + 1);
-        yourTurn && setStatus(`It is ${name}'s turn`)
+        
+         
         //stepNumber === 8 && setStatus("Tie");
         /*for(let m = 0; m<9; m++) {
           move[m] !== null && setStatus('Tie');
@@ -73,9 +74,12 @@ const Game = ({ location }) => {
     });
 
     socket.on('turn', (turn) => {
-      setYourTurn(true);
-      console.log(yourTurn);
-    })
+      setYourTurn(true); 
+      setStatus('It is your turn');
+      
+      
+    });
+    console.log(yourTurn);
 
     socket.on('roomData', ({ pp }) => {
       const userList = pp.slice(0,2);
@@ -92,7 +96,6 @@ const Game = ({ location }) => {
     });
 
     socket.on('reset', () => {
-        setUsers(users.slice(0,1))
     })
   }, [ENDPOINT, location.search]);
 
@@ -127,7 +130,6 @@ const Game = ({ location }) => {
     }
 
     socket.emit("move",  {
-      name: queryString.parse(location.search).name,
       room: queryString.parse(location.search).room,
       move: square,
       location: i,
@@ -135,24 +137,25 @@ const Game = ({ location }) => {
     });
 
     socket.emit('turn', {
+      room: room,
     });
-
     
+    //set status after sending move to be other player's name
+    if(name === users[0].name){
+      setStatus(`It is ${users[1].name}'s turn`)
+    }
+    else if(name === users[1].name) {
+      setStatus(`It is ${users[0].name}'s turn`)
+    }
   };
 
   const handleReset = () => {
-    setYourTurn((queryString.parse(location.search).turn === '1' ? true : false));
-    setSquares(Array(9).fill(null));
-    const square = squares.slice();
-    setStepNumber(0);
-    setStatus(`It is ${users[0].name} turn`);
-    /*socket.emit('reset', {
-        move: squares,
-        turn: yourTurn,
-        stepNumber: stepNumber,
-        room: queryString.parse(location.search).room,
-        status: status
-    })*/
+    socket.emit('playAgain', {
+      pp: users,
+      room: room,
+      id: socket.id,
+      name: name
+    })
   };
 
   const winner = (squares) => {
@@ -205,11 +208,8 @@ const Game = ({ location }) => {
 
           <div className='win'>
             {(win || stepNumber === 9) && (
-              <Link to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
-                    <button onClick={socket.emit('playAgain', {
-                  pp: users,
-                  room: queryString.parse(location.search).room,
-                    })}className ={'button mt-20'}>Play Again?</button>
+              <Link onClick={handleReset()}to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
+                    <button className ={'button mt-20'}>Play Again?</button>
               </Link>
             )}
             <br></br>
