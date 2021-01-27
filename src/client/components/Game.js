@@ -76,16 +76,16 @@ const Game = ({ location }) => {
     socket.on('turn', (turn) => {
       setYourTurn(true); 
       setStatus('It is your turn');
-      
+      console.log(yourTurn);
       
     });
-    console.log(yourTurn);
+    
 
     socket.on('roomData', ({ pp }) => {
       const userList = pp.slice(0,2);
       setUsers('');
       setUsers(userList);
-      console.log(userList);
+      //console.log(userList);
       setStatus(`It is ${userList[0].name}'s turn`)
       setXPlayer(userList[0].name);
       setOPlayer(userList[1].name);
@@ -95,8 +95,6 @@ const Game = ({ location }) => {
         
     });
 
-    socket.on('reset', () => {
-    })
   }, [ENDPOINT, location.search]);
 
     /*useEffect(() => {
@@ -151,10 +149,9 @@ const Game = ({ location }) => {
 
   const handleReset = () => {
     socket.emit('playAgain', {
-      pp: users,
       room: room,
-      id: socket.id,
-      name: name
+      name: name,
+      id: socket.id
     })
   };
 
@@ -189,7 +186,7 @@ const Game = ({ location }) => {
     victory = "The winner is pp";
   }
 
-  console.log(queryString.parse(location.search).room);
+  //console.log(queryString.parse(location.search).room);
 
   return (
     <div className='body'>
@@ -208,7 +205,7 @@ const Game = ({ location }) => {
 
           <div className='win'>
             {(win || stepNumber === 9) && (
-              <Link onClick={handleReset()}to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
+              <Link onClick={handleReset()} to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
                     <button className ={'button mt-20'}>Play Again?</button>
               </Link>
             )}

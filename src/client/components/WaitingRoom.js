@@ -14,6 +14,7 @@ const WaitingRoom = ({ location }) => {
     const [flag, setFlag] = useState(0);
     const [xPlayer, setXPlayer] = useState('')
     const [oPlayer, setOPlayer] = useState('');
+    const [count, setCount] = useState(0);
     const ENDPOINT = "http://localhost:8000";
 
     useEffect(() => {
@@ -40,11 +41,6 @@ const WaitingRoom = ({ location }) => {
             //setOPlayer(users[1].name);
             //console.log(pp);
         });
-
-        socket.on('playAgain', ({ pp }) => {
-            setUsers('');
-            console.log(users);
-        })
 
         //socket.to(users[0].id).emit('turn', {turn});
     }, [])

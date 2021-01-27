@@ -48,13 +48,9 @@ io.on("connect", (socket) => {
     socket.to(room).emit('turn', { turn })
   })
 
-  socket.on('userList', ({ userList, room }) => {
-    console.log(userList);
-    io.to(room).emit('userList', { userList });
-  })
 
-  socket.on('playAgain', ({ pp, room }) => {
-    io.to(room).emit('playAgain', {})
+  socket.on('playAgain', ({ room }) => {
+    io.to(room).emit('reset', { vote: 1 })
     io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
   })
 
