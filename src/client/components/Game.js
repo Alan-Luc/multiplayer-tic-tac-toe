@@ -26,6 +26,8 @@ const Game = ({ location }) => {
   const [moves, setMoves] = useState(undefined);
   const ENDPOINT = "http://localhost:8000";
   //const users2 = users.slice();
+  const [count, setCount] = useState(9);
+  const [socketId, setSocketId] = useState('');
 
   useEffect(() => {
     //const { name, room } = queryString.parse(location.search);
@@ -55,7 +57,7 @@ const Game = ({ location }) => {
     });*/
     //setRoom(room);
 
-    socket.on('move', ({ move, location }) => {
+    socket.on('move', ({ move, location, stepNumber }) => {
         square[location] = move;
         setSquares(move);
         //setStepNumber(stepNumber + 1);
@@ -69,8 +71,10 @@ const Game = ({ location }) => {
         console.log(move);
         //console.log(turn);
         console.log(name);
-        console.log(users.length);
+        console.log(users);
+        console.log(socket.id);
         //console.log(stepNumber);
+        
     });
 
     socket.on('turn', (turn) => {
@@ -89,11 +93,14 @@ const Game = ({ location }) => {
       setStatus(`It is ${userList[0].name}'s turn`)
       setXPlayer(userList[0].name);
       setOPlayer(userList[1].name);
+      setSocketId((name === userList[0].name) ? userList[0].id : userList[1].id)
       //console.log(pp[1].name);
       //console.log(pp[0].name);
       //console.log(socket.id);
         
     });
+    setCount(count-1);
+    console.log(count);
 
   }, [ENDPOINT, location.search]);
 
@@ -131,7 +138,7 @@ const Game = ({ location }) => {
       room: queryString.parse(location.search).room,
       move: square,
       location: i,
-      stepNumber: stepNumber
+      stepNumber: count
     });
 
     socket.emit('turn', {
@@ -183,7 +190,10 @@ const Game = ({ location }) => {
   let victory;
   const win = winner(squares);
   if (win) {
-    victory = "The winner is pp";
+    victory = (win === 'X') ? `The winner is ${xPlayer}` : `The winner is ${oPlayer}`
+  }
+  else if(count === 0) {
+    setStatus('Tie');
   }
 
   //console.log(queryString.parse(location.search).room);
@@ -204,14 +214,14 @@ const Game = ({ location }) => {
           <br />
 
           <div className='win'>
-            {(win || stepNumber === 9) && (
+            {(win || count === 0) && (
               <Link onClick={handleReset()} to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
                     <button className ={'button mt-20'}>Play Again?</button>
               </Link>
             )}
             <br></br>
             <br></br>
-            {(win || stepNumber === 9) && (
+            {(win || count === 0) && (
               <Link to={"/"}>
                 <button className='button2'>Exit</button>
               </Link>

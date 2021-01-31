@@ -49,9 +49,10 @@ io.on("connect", (socket) => {
   })
 
 
-  socket.on('playAgain', ({ room }) => {
-    io.to(room).emit('reset', { vote: 1 })
-    io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
+  socket.on('playAgain', ({ room, id }) => {
+    const user = removeUser(id);
+
+    user && io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
   })
 
   socket.on("disconnect", () => {
@@ -71,8 +72,10 @@ io.on("connect", (socket) => {
     }*/
 });
 
-server.listen(process.env.PORT || 8000, () =>
-  console.log("Server has started.")
+const PORT = process.env.PORT || 8000;
+
+server.listen(PORT, () =>
+  console.log(`Server has started on port ${PORT}.`)
 );
 
 
