@@ -27,7 +27,6 @@ const Game = ({ location }) => {
   const ENDPOINT = "http://localhost:8000";
   //const users2 = users.slice();
   const [count, setCount] = useState(9);
-  const [socketId, setSocketId] = useState('');
 
   useEffect(() => {
     //const { name, room } = queryString.parse(location.search);
@@ -93,7 +92,6 @@ const Game = ({ location }) => {
       setStatus(`It is ${userList[0].name}'s turn`)
       setXPlayer(userList[0].name);
       setOPlayer(userList[1].name);
-      setSocketId((name === userList[0].name) ? userList[0].id : userList[1].id)
       //console.log(pp[1].name);
       //console.log(pp[0].name);
       //console.log(socket.id);
@@ -159,6 +157,7 @@ const Game = ({ location }) => {
       room: room,
       name: name,
       id: socket.id
+      //try using id to remove users from users array to reset rooms
     })
   };
 
