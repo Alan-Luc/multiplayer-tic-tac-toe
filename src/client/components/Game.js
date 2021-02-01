@@ -27,12 +27,13 @@ const Game = ({ location }) => {
   const ENDPOINT = "http://localhost:8000";
   //const users2 = users.slice();
   const [count, setCount] = useState(9);
+  const [socketId, setSocketId] = useState('');
 
   useEffect(() => {
     //const { name, room } = queryString.parse(location.search);
 
     socket = io.connect(ENDPOINT);
-    const square = squares.slice();
+    
     
     //setName(queryString.parse(location.search).name);
     
@@ -56,12 +57,21 @@ const Game = ({ location }) => {
     });*/
     //setRoom(room);
 
-    socket.on('move', ({ move, location, stepNumber }) => {
+    
+    setCount(count-1);
+    console.log(count);
+
+  }, [ENDPOINT, location.search]);
+
+    useEffect(() => {
+      const square = squares.slice();
+
+      socket.on('move', ({ move, location, stepNumber }) => {
         square[location] = move;
         setSquares(move);
         //setStepNumber(stepNumber + 1);
         
-         
+          
         //stepNumber === 8 && setStatus("Tie");
         /*for(let m = 0; m<9; m++) {
           move[m] !== null && setStatus('Tie');
@@ -71,43 +81,36 @@ const Game = ({ location }) => {
         //console.log(turn);
         console.log(name);
         console.log(users);
-        console.log(socket.id);
+        console.log(socketId);
         //console.log(stepNumber);
-        
-    });
+      });
 
-    socket.on('turn', (turn) => {
-      setYourTurn(true); 
-      setStatus('It is your turn');
-      console.log(yourTurn);
+      socket.on('turn', (turn) => {
+        setYourTurn(true); 
+        setStatus('It is your turn');
+        console.log(yourTurn);
+      });
       
-    });
-    
 
-    socket.on('roomData', ({ pp }) => {
-      const userList = pp.slice(0,2);
-      setUsers('');
-      setUsers(userList);
-      //console.log(userList);
-      setStatus(`It is ${userList[0].name}'s turn`)
-      setXPlayer(userList[0].name);
-      setOPlayer(userList[1].name);
-      //console.log(pp[1].name);
-      //console.log(pp[0].name);
-      //console.log(socket.id);
-        
-    });
-    setCount(count-1);
-    console.log(count);
-
-  }, [ENDPOINT, location.search]);
-
-    /*useEffect(() => {
-        socket.on('roomData', ({ users }) => {
-            setUsers(users);
-            console.log(users);
-        })
-    }, []);*/
+      socket.on('roomData', ({ pp }) => {
+        const userList = pp.slice(0,2);
+        setUsers('');
+        setUsers(userList);
+        //console.log(userList);
+        setStatus(`It is ${userList[0].name}'s turn`)
+        setXPlayer(userList[0].name);
+        setOPlayer(userList[1].name);
+        //console.log(pp[1].name);
+        //console.log(pp[0].name);
+        //console.log(socket.id);
+        if(name === xPlayer) {
+          setSocketId(users[0].id)
+        }
+        else if(name === oPlayer) {
+          setSocketId(users[1].id)
+        }
+      });
+    }, []);
 
   const handleClick = (i) => {
     const square = squares.slice();
@@ -156,8 +159,7 @@ const Game = ({ location }) => {
     socket.emit('playAgain', {
       room: room,
       name: name,
-      id: socket.id
-      //try using id to remove users from users array to reset rooms
+      id: socketId
     })
   };
 
@@ -215,7 +217,7 @@ const Game = ({ location }) => {
           <div className='win'>
             {(win || count === 0) && (
               <Link onClick={handleReset()} to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
-                    <button className ={'button mt-20'}>Play Again?</button>
+                    <button onClick={handleReset()} className ={'button mt-20'}>Play Again?</button>
               </Link>
             )}
             <br></br>

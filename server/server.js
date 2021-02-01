@@ -40,7 +40,7 @@ io.on("connect", (socket) => {
   socket.on("move", ({ room, move, location, stepNumber }) => {
     //const user = getUser(socket.id);
     console.log(move);
-    console.log(stepNumber)
+    //console.log(stepNumber)
     io.to(room).emit("move", { move, location, stepNumber });
   });
 
@@ -51,8 +51,10 @@ io.on("connect", (socket) => {
 
   socket.on('playAgain', ({ room, id }) => {
     const user = removeUser(id);
-
-    user && io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
+    console.log(id);
+    if(user) {
+      io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
+    }
   })
 
   socket.on("disconnect", () => {
@@ -64,6 +66,7 @@ io.on("connect", (socket) => {
         text: `${user.name} has left.`,
       });
       io.to(user.room).emit('roomData', { room: user.room, pp: getUsersInRoom(user.room)});
+      io.to(user.room).emit('playAgain', {});
     }
   });
 
