@@ -50,11 +50,12 @@ io.on("connect", (socket) => {
 
 
   socket.on('playAgain', ({ room, id }) => {
-    const user = removeUser(id);
-    console.log(id);
-    if(user) {
-      io.to(room).emit('roomData', { room: room, pp: getUsersInRoom(room)})
-    }
+    socket.to(room).emit('warning', {});
+  })
+
+  socket.on('exit', ({ id, room }) => {
+    socket.leave(room);
+    removeUser(id);
   })
 
   socket.on("disconnect", () => {

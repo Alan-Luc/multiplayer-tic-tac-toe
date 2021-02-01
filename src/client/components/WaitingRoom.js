@@ -47,6 +47,7 @@ const WaitingRoom = ({ location }) => {
 
         //socket.to(users[0].id).emit('turn', {turn});
     }, [])
+    //(users.length%2 === 0) && setUsers('');
 
     return (
         <div className = "joinOuterContainer">

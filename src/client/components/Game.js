@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import queryString from "query-string";
 import io from "socket.io-client";
 
@@ -28,6 +28,7 @@ const Game = ({ location }) => {
   //const users2 = users.slice();
   const [count, setCount] = useState(9);
   const [socketId, setSocketId] = useState('');
+  const [executeTimeout, setExecuteTimeout] = useState(true);
 
   useEffect(() => {
     //const { name, room } = queryString.parse(location.search);
@@ -110,6 +111,14 @@ const Game = ({ location }) => {
           setSocketId(users[1].id)
         }
       });
+      socket.on('warning', () => {
+        setTimeout(() =>{
+          if(executeTimeout){
+          return(<Redirect to={'/'}></Redirect>)
+          }
+        }, 10000)
+      });
+
     }, []);
 
   const handleClick = (i) => {
@@ -161,6 +170,14 @@ const Game = ({ location }) => {
       name: name,
       id: socketId
     })
+    setExecuteTimeout(false);
+  };
+
+  const handleExit = () => {
+    socket.emit('exit', {
+      id: socketId,
+      room: room
+    });
   };
 
   const winner = (squares) => {
@@ -223,8 +240,8 @@ const Game = ({ location }) => {
             <br></br>
             <br></br>
             {(win || count === 0) && (
-              <Link to={"/"}>
-                <button className='button2'>Exit</button>
+              <Link onClick={handleExit()} to={"/"}>
+                <button onClick={handleExit()}className='button2'>Exit</button>
               </Link>
             )}
           </div>
