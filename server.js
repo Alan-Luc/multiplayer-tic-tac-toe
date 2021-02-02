@@ -18,7 +18,7 @@ const server = http.createServer(app);
 //Cors setup
 const io = require("socket.io")(server, {
   cors: {
-    //testing origin: "http://localhost:3000",
+    //origin: "http://localhost:3000",
     origin: "https://alan-tic-tac-toe.herokuapp.com/",
     methods: ["GET", "POST"],
     allowedHeaders: ["Access-Control-Allow-Origin"],

@@ -10,7 +10,7 @@ let socket = io("https://alan-tic-tac-toe.herokuapp.com/", {
 
 /*let socket = io("http://localhost:8000", {
   withCredentials: true,
-}); testing usage*/
+});*/ //testing usage
 const WaitingRoom = ({ location }) => {
     const [users, setUsers] = useState('');
     const [name, setName] = useState('');
@@ -20,7 +20,7 @@ const WaitingRoom = ({ location }) => {
     const [oPlayer, setOPlayer] = useState('');
     const [count, setCount] = useState(0);
     const ENDPOINT = "https://alan-tic-tac-toe.herokuapp.com/";
-    // for testing const ENDPOINT = "http://localhost:8000";
+    //const ENDPOINT = "http://localhost:8000";
 
     useEffect(() => {
         socket = io.connect(ENDPOINT);

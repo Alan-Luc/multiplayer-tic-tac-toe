@@ -74,9 +74,9 @@ const Game = ({ location }) => {
   }, [ENDPOINT, location.search]);
 
     useEffect(() => {
-      const square = squares.slice();
+      var square = squares.slice();
       socket.on('turn', (turn) => {
-        
+        const pp = [...squares]
         console.log(square);
         setYourTurn(true);
         if(tie(square) === true) {
@@ -96,7 +96,7 @@ const Game = ({ location }) => {
       
 
       socket.on('move', ({ move, location, stepNumber }) => {
-        square[location] = move;
+        square = move;
         setSquares(move);
         //setStepNumber(stepNumber + 1);
         console.log(tie(move));
