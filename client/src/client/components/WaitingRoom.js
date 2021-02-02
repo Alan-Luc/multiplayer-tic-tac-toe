@@ -4,9 +4,13 @@ import io from 'socket.io-client'
 import queryString from 'query-string'
 
 
-let socket = io("http://localhost:8000", {
+let socket = io("https://infinite-fjord-07589.herokuapp.com/", {
   withCredentials: true,
 });
+
+/*let socket = io("http://localhost:8000", {
+  withCredentials: true,
+}); testing usage*/
 const WaitingRoom = ({ location }) => {
     const [users, setUsers] = useState('');
     const [name, setName] = useState('');
@@ -15,7 +19,8 @@ const WaitingRoom = ({ location }) => {
     const [xPlayer, setXPlayer] = useState('')
     const [oPlayer, setOPlayer] = useState('');
     const [count, setCount] = useState(0);
-    const ENDPOINT = "http://localhost:8000";
+    const ENDPOINT = "https://infinite-fjord-07589.herokuapp.com/";
+    // for testing const ENDPOINT = "http://localhost:8000";
 
     useEffect(() => {
         socket = io.connect(ENDPOINT);
