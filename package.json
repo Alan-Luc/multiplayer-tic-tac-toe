@@ -1,50 +1,29 @@
 {
-  "name": "websockets-experimental",
-  "version": "0.1.0",
-  "private": true,
+  "name": "multiplayer-tic-tac-toe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "router.js",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.11.8",
-    "@testing-library/react": "^11.2.2",
-    "@testing-library/user-event": "^12.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "query-string": "^6.13.8",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-route": "^1.0.3",
-    "react-router": "^5.2.0",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.1",
-    "socket.io": "^3.0.5",
-    "socket.io-client": "^3.0.5",
-    "web-vitals": "^0.2.4"
+    "nodemon": "^2.0.7",
+    "path": "^0.12.7",
+    "socket.io": "^3.1.0"
   },
+  "devDependencies": {},
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "heroku-postbuild": "npm install --only=dev && npm install && npm run build"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alan-Luc/multiplayer-tic-tac-toe.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alan-Luc/multiplayer-tic-tac-toe/issues"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.7"
-  }
+  "homepage": "https://github.com/Alan-Luc/multiplayer-tic-tac-toe#readme"
 }
