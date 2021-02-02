@@ -4,7 +4,7 @@ import io from 'socket.io-client'
 import queryString from 'query-string'
 
 
-let socket = io("https://infinite-fjord-07589.herokuapp.com/", {
+let socket = io("https://alan-tic-tac-toe.herokuapp.com/", {
   withCredentials: true,
 });
 
@@ -19,7 +19,7 @@ const WaitingRoom = ({ location }) => {
     const [xPlayer, setXPlayer] = useState('')
     const [oPlayer, setOPlayer] = useState('');
     const [count, setCount] = useState(0);
-    const ENDPOINT = "https://infinite-fjord-07589.herokuapp.com/";
+    const ENDPOINT = "https://alan-tic-tac-toe.herokuapp.com/";
     // for testing const ENDPOINT = "http://localhost:8000";
 
     useEffect(() => {

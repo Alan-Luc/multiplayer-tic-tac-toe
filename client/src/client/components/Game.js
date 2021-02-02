@@ -8,7 +8,7 @@ import "./Game.css";
 
 
 //production
-let socket = io("https://infinite-fjord-07589.herokuapp.com/", {
+let socket = io("https://alan-tic-tac-toe.herokuapp.com/", {
   withCredentials: true,
 });
 
@@ -31,7 +31,7 @@ const Game = ({ location }) => {
   //const users = useRef();
   const [flag, setFlag] = useState(0);
   const [moves, setMoves] = useState(undefined);
-  const ENDPOINT = "https://infinite-fjord-07589.herokuapp.com/";
+  const ENDPOINT = "https://alan-tic-tac-toe.herokuapp.com/";
   //const ENDPOINT = "http://localhost:8000";
   //^testing
   //const users2 = users.slice();
