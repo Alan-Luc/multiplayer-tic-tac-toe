@@ -66,13 +66,36 @@ const Game = ({ location }) => {
 
     useEffect(() => {
       const square = squares.slice();
+      socket.on('turn', (turn) => {
+        
+        console.log(square);
+        setYourTurn(true);
+        if(tie(square) === true) {
+          setStatus('Tie');
+          console.log('pp2')
+        }
+        else if(status !== 'Tie') {
+          setStatus('It is your turn');
+          console.log('pp3');
+        } 
+        console.log(yourTurn);
+        console.log(tie(square));
+        
+      });
+
+
+      
 
       socket.on('move', ({ move, location, stepNumber }) => {
         square[location] = move;
         setSquares(move);
         //setStepNumber(stepNumber + 1);
+        console.log(tie(move));
+        if(tie(move) === true) {
+          console.log('pp');
+          setStatus('Tie')
+        }
         
-          
         //stepNumber === 8 && setStatus("Tie");
         /*for(let m = 0; m<9; m++) {
           move[m] !== null && setStatus('Tie');
@@ -86,11 +109,7 @@ const Game = ({ location }) => {
         //console.log(stepNumber);
       });
 
-      socket.on('turn', (turn) => {
-        setYourTurn(true); 
-        setStatus('It is your turn');
-        console.log(yourTurn);
-      });
+      
       
 
       socket.on('roomData', ({ pp }) => {
@@ -112,6 +131,7 @@ const Game = ({ location }) => {
         }
       });
       socket.on('warning', () => {
+        setStatus('Click play again within 10s to play again')
         setTimeout(() =>{
           if(executeTimeout){
           return(<Redirect to={'/'}></Redirect>)
@@ -124,6 +144,7 @@ const Game = ({ location }) => {
   const handleClick = (i) => {
     const square = squares.slice();
     const win = winner(square);
+    const pp = tie(square);
     
 
     if (win || squares[i]) {
@@ -143,12 +164,14 @@ const Game = ({ location }) => {
     if (win) {
       setStatus("");
     }
+    if(pp === true) {
+      setStatus('Tie');
+    }
 
     socket.emit("move",  {
       room: queryString.parse(location.search).room,
       move: square,
       location: i,
-      stepNumber: count
     });
 
     socket.emit('turn', {
@@ -205,13 +228,23 @@ const Game = ({ location }) => {
     return null;
   };
 
+  const tie = (squares) => {
+    for(let m = 0; m<9 ; m++) {
+      if(squares[m] === null ) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   let victory;
   const win = winner(squares);
+  const pp = tie(squares);
   if (win) {
     victory = (win === 'X') ? `The winner is ${xPlayer}` : `The winner is ${oPlayer}`
   }
-  else if(count === 0) {
-    setStatus('Tie');
+  else if(pp === true) {
+    victory = 'Tie'
   }
 
   //console.log(queryString.parse(location.search).room);
@@ -232,16 +265,16 @@ const Game = ({ location }) => {
           <br />
 
           <div className='win'>
-            {(win || count === 0) && (
-              <Link onClick={handleReset()} to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
-                    <button onClick={handleReset()} className ={'button mt-20'}>Play Again?</button>
+            {(win || pp === true) && (
+              <Link onClick={() => handleReset()} to={`/waitingRoom/${room}?name=${name}&room=${room}`} >
+                    <button onClick={() => handleReset()} className ={'button mt-20'}>Play Again?</button>
               </Link>
             )}
             <br></br>
             <br></br>
-            {(win || count === 0) && (
-              <Link onClick={handleExit()} to={"/"}>
-                <button onClick={handleExit()}className='button2'>Exit</button>
+            {(win || pp === true) && (
+              <Link onClick={() => handleExit()} to={"/"}>
+                <button onClick={() => handleExit()}className='button2'>Exit</button>
               </Link>
             )}
           </div>

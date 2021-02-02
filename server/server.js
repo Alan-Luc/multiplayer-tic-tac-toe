@@ -9,6 +9,9 @@ const router = require("./router");
 //App Setup
 const server = http.createServer(app);
 
+
+
+
 //Socket Setup
 //Cors setup
 const io = require("socket.io")(server, {
@@ -22,6 +25,11 @@ const io = require("socket.io")(server, {
 
 app.use(cors());
 app.use(router);
+
+app.get("*", (req, res) => {
+  res.sendFile('../build/index.html');
+}); //used in production
+
 
 io.on("connect", (socket) => {
   console.log("made socket connection", socket.id);
@@ -50,6 +58,7 @@ io.on("connect", (socket) => {
 
 
   socket.on('playAgain', ({ room, id }) => {
+    //kick both players if both dont press play again
     socket.to(room).emit('warning', {});
   })
 
